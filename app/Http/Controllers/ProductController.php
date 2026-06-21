@@ -10,7 +10,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Product $product)
+    public function index()
     {
         $products = Product::all();
         return view('products.index', compact('products'));
@@ -29,7 +29,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        Product::create($request->only(['name', 'description', 'price', 'stock']));
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0'
+        ]);
+        Product::create($validated);
         return to_route('products.index');
     }
 
@@ -54,7 +60,13 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product->update($request->only(['name', 'description', 'price', 'stock']));
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0'
+        ]);
+        $product->update($validated);
         return to_route('products.index');
     }
 
@@ -64,6 +76,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        to_route('products.index');
+        return to_route('products.index');
     }
 }
